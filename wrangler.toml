@@ -23,7 +23,7 @@ preview_id = "9b7079d2d0d142f7b7687350bf0fe03a"
 
 # ─── Environment Variables ────────────────────────────────────────────────────
 [vars]
-BASE_URL = "https://mlnk.io"
+BASE_URL = "https://microlink.ankushkamble1999.workers.dev"
 REDIRECT_MODE = "302"            # "301" | "302"
 DEFAULT_TTL_DAYS = "365"
 MAX_URL_LENGTH = "2048"

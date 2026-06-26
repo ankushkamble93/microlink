@@ -35,12 +35,11 @@ export async function handleHealth(c: Context<{ Bindings: Env }>): Promise<Respo
   }
 
   // ── KV liveness probe ─────────────────────────────────────────────────────
+  // KV is eventually consistent — we only test that the put call itself
+  // succeeds (no network/auth error). A read-after-write miss is expected
+  // behaviour at edge and is not a health failure.
   try {
-    const probe = `health:${Date.now()}`;
-    await env.REDIRECT_CACHE.put(probe, "1", { expirationTtl: 10 });
-    const val = await env.REDIRECT_CACHE.get(probe);
-    if (val !== "1") throw new Error("KV round-trip failed");
-    await env.REDIRECT_CACHE.delete(probe);
+    await env.REDIRECT_CACHE.put(`health:probe`, "1", { expirationTtl: 60 });
   } catch {
     checks.cache = "error";
   }
