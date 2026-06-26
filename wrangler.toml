@@ -1,0 +1,48 @@
+name = "microlink"
+main = "src/index.ts"
+compatibility_date = "2024-06-14"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+
+# ─── KV Namespaces ────────────────────────────────────────────────────────────
+[[kv_namespaces]]
+binding = "REDIRECT_CACHE"
+id = "6720df18c48b44ee940d697b1a3037a9"
+preview_id = "b62681eed04f40f2a13d53571b1c67e8"
+
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "c553e62114814c708430f8b677505ff4"
+preview_id = "9b7079d2d0d142f7b7687350bf0fe03a"
+
+# ─── Secrets (set via `wrangler secret put`) ──────────────────────────────────
+# SUPABASE_URL           — your Supabase project URL
+# SUPABASE_SERVICE_KEY   — service-role key (server-side only, never exposed)
+# SAFE_BROWSING_API_KEY  — Google Safe Browsing API key (optional)
+# ID_SHUFFLE_SEED        — 64-bit integer seed for bit-shuffle obfuscation
+
+# ─── Environment Variables ────────────────────────────────────────────────────
+[vars]
+BASE_URL = "https://mlnk.io"
+REDIRECT_MODE = "302"            # "301" | "302"
+DEFAULT_TTL_DAYS = "365"
+MAX_URL_LENGTH = "2048"
+KEY_MIN_LENGTH = "6"
+KEY_MAX_LENGTH = "12"
+RATE_LIMIT_WINDOW_MS = "60000"   # 1 minute
+RATE_LIMIT_MAX_REQUESTS = "30"   # 30 req/min per IP
+COLLISION_MAX_RETRIES = "3"
+ENABLE_SAFE_BROWSING = "false"   # set to "true" once key is configured
+ANALYTICS_ENABLED = "true"
+
+# ─── Local dev overrides ──────────────────────────────────────────────────────
+[env.dev]
+vars = { BASE_URL = "http://localhost:8787" }
+
+# ─── Production ───────────────────────────────────────────────────────────────
+[env.production]
+vars = { REDIRECT_MODE = "302", ENABLE_SAFE_BROWSING = "true" }
+
+# ─── Observability ────────────────────────────────────────────────────────────
+[observability]
+enabled = true
