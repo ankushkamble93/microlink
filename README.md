@@ -4,6 +4,8 @@
 
 Built to be a premier engineering showcase: pristine architecture, rigorous edge-case handling, comprehensive tests, and zero AWS costs.
 
+**Live demo → [microlink.ankushkamble1999.workers.dev](https://microlink.ankushkamble1999.workers.dev)**
+
 ---
 
 ## Live Stack — Zero AWS, Zero Cost
@@ -121,6 +123,27 @@ Applied to `/api/shorten` and `/api/analytics/:key`. The redirect hot path is in
 
 ---
 
+## Demo
+
+| Endpoint | URL |
+|---|---|
+| Web UI | [microlink.ankushkamble1999.workers.dev](https://microlink.ankushkamble1999.workers.dev) |
+| Health | [microlink.ankushkamble1999.workers.dev/health](https://microlink.ankushkamble1999.workers.dev/health) |
+| Shorten (API) | `POST https://microlink.ankushkamble1999.workers.dev/api/shorten` |
+| Analytics | `GET https://microlink.ankushkamble1999.workers.dev/api/analytics/:key` |
+
+```bash
+# Shorten a URL via curl
+curl -X POST https://microlink.ankushkamble1999.workers.dev/api/shorten \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://github.com/ankushkamble93/microlink"}'
+
+# Follow the redirect
+curl -I https://microlink.ankushkamble1999.workers.dev/Cw8rNp
+```
+
+---
+
 ## API Reference
 
 ### `POST /api/shorten`
@@ -139,7 +162,7 @@ Create a short URL.
 **Response 201**
 ```json
 {
-  "short_url": "https://mlnk.io/my-promo",
+  "short_url": "https://microlink.ankushkamble1999.workers.dev/my-promo",
   "short_key": "my-promo",
   "long_url": "https://very-long-url.com/path?query=value",
   "expires_at": "2025-07-26T00:00:00.000Z",
@@ -239,7 +262,11 @@ npm run deploy
 
 ### Step 5: Configure Custom Domain (Optional)
 
-In Cloudflare dashboard → Workers → your worker → Custom Domains → add `mlnk.io` (or your domain).
+In Cloudflare dashboard → Workers → your worker → Custom Domains → add your domain.
+
+### Step 6: Supabase Keep-Alive (Already Configured)
+
+The cron trigger in `wrangler.toml` pings Supabase every 4 days automatically, preventing the free-tier project from being paused due to inactivity. No setup needed — it deploys with the worker.
 
 ---
 
@@ -306,6 +333,7 @@ microlink/
 │   ├── index.ts                  # Worker entry point (Hono router)
 │   ├── types.ts                  # Shared interfaces, branded types, error taxonomy
 │   ├── handlers/
+│   │   ├── home.ts               # GET /  ← browser UI
 │   │   ├── shorten.ts            # POST /api/shorten
 │   │   ├── redirect.ts           # GET /:key  ← hot path
 │   │   ├── analytics.ts          # GET /api/analytics/:key
