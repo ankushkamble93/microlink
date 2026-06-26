@@ -19,6 +19,7 @@ import { handleShorten } from "./handlers/shorten";
 import { handleRedirect } from "./handlers/redirect";
 import { handleAnalytics } from "./handlers/analytics";
 import { handleHealth } from "./handlers/health";
+import { handleHome } from "./handlers/home";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -30,6 +31,9 @@ app.use("*", corsHeaders(["*"]));
 // Rate limit only the write-heavy and analytics endpoints.
 app.post("/api/shorten", rateLimiter(), handleShorten);
 app.get("/api/analytics/:key", rateLimiter(), handleAnalytics);
+
+// ─── Home UI ─────────────────────────────────────────────────────────────────
+app.get("/", handleHome);
 
 // ─── Health ───────────────────────────────────────────────────────────────────
 app.get("/health", handleHealth);

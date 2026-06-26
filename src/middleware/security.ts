@@ -12,10 +12,14 @@ export function securityHeaders() {
   return async (c: Context<{ Bindings: Env }>, next: Next): Promise<void> => {
     await next();
 
-    // Content Security Policy — restrictive baseline; tighten further per route if needed.
+    // Content Security Policy — the home UI uses an inline script, so the root
+    // path gets a relaxed policy. All other routes stay maximally restrictive.
+    const isHomePage = c.req.path === "/";
     c.header(
       "Content-Security-Policy",
-      "default-src 'none'; script-src 'none'; object-src 'none'; frame-ancestors 'none';"
+      isHomePage
+        ? "default-src 'none'; script-src 'unsafe-inline'; connect-src 'self'; style-src 'unsafe-inline'; frame-ancestors 'none';"
+        : "default-src 'none'; script-src 'none'; object-src 'none'; frame-ancestors 'none';"
     );
 
     // HSTS — tell browsers to always use HTTPS for this origin for 1 year.
