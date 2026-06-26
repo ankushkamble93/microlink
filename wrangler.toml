@@ -43,6 +43,13 @@ vars = { BASE_URL = "http://localhost:8787" }
 [env.production]
 vars = { REDIRECT_MODE = "302", ENABLE_SAFE_BROWSING = "true" }
 
+# ─── Cron Triggers ───────────────────────────────────────────────────────────
+# Runs every 4 days to keep the Supabase free-tier project from being paused
+# (Supabase pauses after 7 days of inactivity). 4 days gives a comfortable
+# buffer. Uses zero external services — the worker pings its own DB directly.
+[triggers]
+crons = ["0 9 */4 * *"]   # 09:00 UTC every 4 days
+
 # ─── Observability ────────────────────────────────────────────────────────────
 [observability]
 enabled = true

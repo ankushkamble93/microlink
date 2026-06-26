@@ -20,6 +20,7 @@ import { handleRedirect } from "./handlers/redirect";
 import { handleAnalytics } from "./handlers/analytics";
 import { handleHealth } from "./handlers/health";
 import { handleHome } from "./handlers/home";
+import { getSupabaseClient } from "./db/client";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -55,4 +56,33 @@ app.onError((err, c) => {
   );
 });
 
-export default app;
+// ─── Scheduled Handler (Cron) ─────────────────────────────────────────────────
+// Cloudflare calls this on the cron schedule defined in wrangler.toml.
+// It performs a lightweight DB query to keep the Supabase free-tier project
+// active (Supabase pauses after 7 days of zero activity).
+async function scheduled(_event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
+  ctx.waitUntil(
+    (async () => {
+      try {
+        const db = getSupabaseClient(env);
+        const { error } = await db
+          .from("urls")
+          .select("id", { count: "exact", head: true })
+          .limit(1);
+
+        if (error) {
+          console.error("[cron] Supabase keep-alive ping failed:", error.message);
+        } else {
+          console.log("[cron] Supabase keep-alive ping succeeded");
+        }
+      } catch (err) {
+        console.error("[cron] Unexpected error during keep-alive:", err);
+      }
+    })()
+  );
+}
+
+export default {
+  fetch: app.fetch.bind(app),
+  scheduled,
+};
